@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_back"
+    tools:context=".Perfil">
+
+    <ImageView
+        android:id="@+id/seta_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/seta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/text_perfil"
+        android:layout_width="235dp"
+        android:layout_height="94dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/text_perfil"
+        android:textColor="@color/white"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/caixa_nome"
+        style="@style/Edit_Text"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/edit_text"
+        android:hint="Nome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_perfil" />
+
+    <EditText
+        android:id="@+id/idade"
+        style="@style/Edit_Text"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/edit_text"
+        android:hint="Idade"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.687"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/caixa_nome" />
+
+    <EditText
+        android:id="@+id/peso"
+        style="@style/Edit_Text"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/edit_text"
+        android:hint="Peso"
+        app:layout_constraintTop_toBottomOf="@id/idade" _toBottomOf="@+id/idade"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
