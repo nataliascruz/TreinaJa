@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Meu Treino</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="bt_ir_para_treino">"Ir para meu treino</string>
+    <string name="bt_meu_perfil">Meu perfil</string>
+    <string name="bem_vindos">Bem vindo!</string>
+    <string name="bt_treno_A">Treino A</string>
+    <string name="bt_treno_b">Treino B</string>
+    <string name="bt_treino_c">Treino C</string>
+    <string name="bt_editar">Editar</string>
+    <string name="bt_excluir">Excluir</string>
+    <string name="bt_concluir">Concluir Treino</string>
+    <string name="bt_adicionar">Adicionar Novo Treino</string>
+    <string name="bt_salvar">Salvar</string>
+    <string name="text_perfil">Perfil</string>
+    <string name="text_final">Parabéns, seu treino foi Finalizado!</string>
+    <string name="descricao_voltar" />
+</resources>
