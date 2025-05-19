@@ -22,7 +22,7 @@
             android:name=".AdicionarTreino"
             android:exported="false" />
         <activity
-            android:name=".MeuPerfil"
+            android:name=".MeuTreino"
             android:exported="false" /> <!-- Atividades com android:exported="false" para não serem acessadas externamente -->
         <activity
             android:name=".MainActivity"

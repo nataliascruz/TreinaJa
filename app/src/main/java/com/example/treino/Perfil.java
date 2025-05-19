@@ -27,7 +27,7 @@ public class Perfil extends AppCompatActivity {
         ImageView setaImage = findViewById(R.id.seta_image);
         setaImage.setOnClickListener(v -> {
             // Intent para voltar à tela de login
-            Intent intent = new Intent(Perfil.this, MeuPerfil.class); // Alteração aqui
+            Intent intent = new Intent(Perfil.this, MeuTreino.class); // Alteração aqui
             startActivity(intent);
             finish(); // Finaliza para evitar retorno ao perfil com botão de voltar
         });
