@@ -56,7 +56,7 @@ public class AdicionarTreino extends AppCompatActivity {
 
             Intent resultIntent = new Intent();
             resultIntent.putExtra("TREINO_SELECIONADO", treinoSelecionado);
-            resultIntent.putExtra("TREINO_DADOS", treinoFormatado);
+            resultIntent.putExtra("NOVO_TREINO", treinoFormatado);
             setResult(RESULT_OK, resultIntent);
             finish();
 
