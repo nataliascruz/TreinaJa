@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context=".MeuPerfil">
+    tools:context=".MeuTreino">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/treinoA"
@@ -71,7 +71,7 @@
 
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/concluit_bt"
+        android:id="@+id/concluir_bt"
         style="@style/Button_Estilo"
         android:layout_width="322dp"
         android:layout_height="51dp"
@@ -95,7 +95,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.377"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/concluit_bt" />
+        app:layout_constraintTop_toBottomOf="@id/concluir_bt" />
 
     <ImageView
         android:id="@+id/seta_image"
