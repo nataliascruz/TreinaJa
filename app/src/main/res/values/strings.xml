@@ -17,4 +17,15 @@
     <string name="text_perfil">Perfil</string>
     <string name="text_final">Parabéns, seu treino foi Finalizado!</string>
     <string name="descricao_voltar" />
+    <string name="digite_seu_texto_aqui">Digite seu texto aqui…</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="salvar">Salvar</string>
+    <string name="edit_num_de_repeticoes">Número de repetições…</string>
+    <string name="edit_num_de_series">Número de séries…</string>
+    <string name="edit_nome_do_exercicio">Nome do exercício…</string>
+    <string name="editar_exercicio">Editar Exercício</string>
+    <string name="nome_do_treino">Nome do treino…</string>
+    <string name="nome_do_exercicio">Nome do exercício…</string>
+    <string name="num_de_series">Número de séries…</string>
+    <string name="num_de_repeticoes">Número de repetições…</string>
 </resources>
