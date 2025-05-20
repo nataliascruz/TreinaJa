@@ -19,20 +19,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Arrays;
 
 public class MeuTreino extends AppCompatActivity {
-
     private TextView caixaDeTexto;
     private Button editarBt, treinoA, treinoB, treinoC, excluir, adicionarBt, concluirBt;
     private ImageView setaImage, personImage;
-
     private SharedPreferences sharedPreferences;
     private static final String PREF_NAME = "MeusTreinosPrefs";
     private static final String KEY_TREINO_A = "treino_a";
     private static final String KEY_TREINO_B = "treino_b";
     private static final String KEY_TREINO_C = "treino_c";
-
     private ActivityResultLauncher<Intent> adicionarTreinoLauncher;
     private ActivityResultLauncher<Intent> editarExercicioLauncher;
-
     private String currentTreino = KEY_TREINO_A;
 
     @Override
