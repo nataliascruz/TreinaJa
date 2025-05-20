@@ -9,7 +9,7 @@
     tools:context=".Perfil">
 
     <ImageView
-        android:id="@+id/seta_image"
+        android:id="@+id/seta_image_perfil"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/seta"
@@ -35,34 +35,75 @@
     <EditText
         android:id="@+id/caixa_nome"
         style="@style/Edit_Text"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/edit_text"
-        android:hint="Nome"
+        android:hint="@string/nome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_perfil" />
 
     <EditText
+        android:id="@+id/peso"
+        style="@style/Edit_Text"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/edit_text"
+        android:hint="@string/peso"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/idade" />
+
+    <EditText
+        android:id="@+id/altura"
+        style="@style/Edit_Text"
+        android:layout_width="331dp"
+        android:layout_height="63dp"
+        android:background="@drawable/edit_text"
+        android:hint="@string/altura"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/peso"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
+        android:id="@+id/objetivo"
+        style="@style/Edit_Text"
+        android:layout_width="331dp"
+        android:layout_height="63dp"
+        android:background="@drawable/edit_text"
+        android:hint="@string/objetivo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.387"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/altura"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
         android:id="@+id/idade"
         style="@style/Edit_Text"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/edit_text"
-        android:hint="Idade"
+        android:hint="@string/idade"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.687"
+        app:layout_constraintHorizontal_bias="0.387"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/caixa_nome" />
 
-    <EditText
-        android:id="@+id/peso"
-        style="@style/Edit_Text"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/edit_text"
-        android:hint="Peso"
-        app:layout_constraintTop_toBottomOf="@id/idade" _toBottomOf="@+id/idade"
+    <Button
+        android:id="@+id/salvar_dados_pessoais_bt"
+        android:layout_width="315dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/orange_button"
+        android:text="@string/salvar_dados_usuario"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/objetivo"
+        app:layout_constraintVertical_bias="0.09" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

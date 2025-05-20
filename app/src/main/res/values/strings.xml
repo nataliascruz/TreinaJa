@@ -28,4 +28,10 @@
     <string name="nome_do_exercicio">Nome do exercício…</string>
     <string name="num_de_series">Número de séries…</string>
     <string name="num_de_repeticoes">Número de repetições…</string>
+    <string name="objetivo">Objetivo</string>
+    <string name="altura">Altura</string>
+    <string name="nome">Nome</string>
+    <string name="idade">Idade</string>
+    <string name="peso">Peso</string>
+    <string name="salvar_dados_usuario">Salvar Dados</string>
 </resources>
