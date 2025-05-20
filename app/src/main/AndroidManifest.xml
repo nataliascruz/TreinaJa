@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Treino"
         tools:targetApi="31">
         <activity
+            android:name=".EditarExercicio"
+            android:exported="false" />
+        <activity
             android:name=".Perfil"
             android:exported="false" />
         <activity
@@ -23,10 +26,10 @@
             android:exported="false" />
         <activity
             android:name=".MeuTreino"
-            android:exported="false" /> <!-- Atividades com android:exported="false" para não serem acessadas externamente -->
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" /> <!-- Atividade principal com android:exported="true" -->
+            android:exported="false" />
         <activity
             android:name=".FormLogin"
             android:exported="true">
