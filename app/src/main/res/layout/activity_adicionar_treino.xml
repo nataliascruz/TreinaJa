@@ -9,7 +9,7 @@
     tools:context=".AdicionarTreino">
 
     <ImageView
-        android:id="@+id/seta_voltar"
+        android:id="@+id/seta_voltar_adicionar_treino"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/seta"
@@ -21,7 +21,7 @@
 
 
     <ImageView
-        android:id="@+id/person_image"
+        android:id="@+id/person_image_adicionar_treino"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/person"

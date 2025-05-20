@@ -10,21 +10,22 @@
 
     <TextView
         android:id="@+id/text_treino_concluido"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="260dp"
-        android:text="@string/text_final"
+        android:layout_width="327dp"
+        android:layout_height="132dp"
+        android:text="@string/message_finalizacao_treino"
         android:textColor="@color/white"
-        android:textSize="35sp"
+        android:textSize="30sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.702"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.447"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <ImageView
-        android:id="@+id/person_image"
+        android:id="@+id/person_image_tela_Concluido"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/person"
@@ -32,6 +33,46 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"/>
+
+    <ImageView
+        android:id="@+id/seta_voltar_Concluido"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/seta"
+        android:contentDescription="@string/descricao_voltar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/ok_concluido"
+        android:layout_width="111dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/orange_button"
+        android:text="@string/ok_concluido"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.764" />
+
+    <TextView
+        android:id="@+id/text_treino_finalizado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="152dp"
+        android:text="@string/treino_finalizado"
+        android:textColor="@color/white"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.532"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

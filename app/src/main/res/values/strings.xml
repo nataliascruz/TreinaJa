@@ -3,7 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="bt_ir_para_treino">"Ir para meu treino</string>
+    <string name="bt_ir_para_treino">Ir para meu treino</string>
     <string name="bt_meu_perfil">Meu perfil</string>
     <string name="bem_vindos">Bem vindo!</string>
     <string name="bt_treno_A">Treino A</string>
@@ -16,7 +16,7 @@
     <string name="bt_salvar">Salvar</string>
     <string name="text_perfil">Perfil</string>
     <string name="text_final">Parabéns, seu treino foi Finalizado!</string>
-    <string name="descricao_voltar" />
+    <string name="descricao_voltar">Voltar para tela anterior</string>
     <string name="digite_seu_texto_aqui">Digite seu texto aqui…</string>
     <string name="cancelar">Cancelar</string>
     <string name="salvar">Salvar</string>
@@ -28,4 +28,15 @@
     <string name="nome_do_exercicio">Nome do exercício…</string>
     <string name="num_de_series">Número de séries…</string>
     <string name="num_de_repeticoes">Número de repetições…</string>
+    <string name="objetivo">Objetivo</string>
+    <string name="altura">Altura</string>
+    <string name="nome">Nome</string>
+    <string name="idade">Idade</string>
+    <string name="peso">Peso</string>
+    <string name="salvar_dados_usuario">Salvar Dados</string>
+    <string name="ok_concluido">OK</string>
+    <string name="treino_finalizado">Treino Finalizado</string>
+    <string name="message_finalizacao_treino">Parabéns por finalizar a montagem do seu treino</string>
+    <string name="remover_exercicio">Remover Exercicio</string>
+    <string name="editar_dados_perfil">Editar Dados</string>
 </resources>

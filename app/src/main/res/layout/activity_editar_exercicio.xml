@@ -9,7 +9,7 @@
     tools:context=".EditarExercicio">
 
     <ImageView
-        android:id="@+id/seta_voltar"
+        android:id="@+id/seta_voltar_edit"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/seta"
