@@ -8,6 +8,18 @@
     android:background="@color/gray_back"
     tools:context=".Perfil">
 
+    <Button
+        android:id="@+id/editar_dados_pessoais_bt"
+        android:layout_width="315dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="@color/yellow_accents"
+        android:text="@string/editar_dados_perfil"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/salvar_dados_pessoais_bt" />
+
     <ImageView
         android:id="@+id/seta_image_perfil"
         android:layout_width="50dp"
@@ -100,10 +112,9 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/objetivo"
-        app:layout_constraintVertical_bias="0.09" />
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

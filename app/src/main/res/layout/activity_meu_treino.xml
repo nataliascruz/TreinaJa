@@ -47,15 +47,14 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/excluir"
         style="@style/Button_Estilo_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="97dp"
+        android:layout_height="49dp"
         android:background="#D9D9D9"
         android:text="@string/bt_excluir"
-        app:layout_constraintEnd_toStartOf="@id/editar_bt"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_texto" />
+        app:layout_constraintEnd_toStartOf="@+id/remover_exercicio"
+        app:layout_constraintHorizontal_bias="0.608"
+        app:layout_constraintStart_toEndOf="@+id/editar_bt"
+        app:layout_constraintTop_toBottomOf="@+id/container_texto" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/editar_bt"
@@ -64,11 +63,22 @@
         android:layout_height="wrap_content"
         android:background="#D9D9D9"
         android:text="@string/bt_editar"
-        app:layout_constraintTop_toBottomOf="@id/container_texto"
-        app:layout_constraintStart_toEndOf="@id/excluir"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintHorizontal_bias="0.053"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/container_texto" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/remover_exercicio"
+        style="@style/Button_Estilo_2"
+        android:layout_width="96dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="275dp"
+        android:background="#D9D9D9"
+        android:text="@string/remover_exercicio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/container_texto"
+        app:layout_constraintTop_toBottomOf="@+id/container_texto" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/concluir_bt"
@@ -98,7 +108,7 @@
         app:layout_constraintTop_toBottomOf="@id/concluir_bt" />
 
     <ImageView
-        android:id="@+id/seta_image"
+        android:id="@+id/seta_image_meu_treino"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/seta"
@@ -108,7 +118,7 @@
         android:layout_marginTop="16dp"/>
 
     <ImageView
-        android:id="@+id/person_image"
+        android:id="@+id/person_image_meu_treino"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/person"
@@ -120,21 +130,21 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/container_texto"
         style="@style/CardView_Estilo"
-        app:layout_constraintTop_toBottomOf="@id/treinoB"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/treinoB">
 
-    <TextView
-        android:id="@+id/caixa_de_texto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:hint="@string/digite_seu_texto_aqui"
-        android:gravity="top|start"
-        android:background="@android:color/transparent"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:enabled="false"
-        android:padding="16dp"/>
+        <TextView
+            android:id="@+id/caixa_de_texto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:enabled="false"
+            android:gravity="top|start"
+            android:hint="@string/digite_seu_texto_aqui"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
 
     </androidx.cardview.widget.CardView>
 

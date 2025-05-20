@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class FormLogin extends AppCompatActivity {
-
     private Button btMeuTreino;
     private Button btPerfil;
 
@@ -39,12 +38,7 @@ public class FormLogin extends AppCompatActivity {
     }
 
     private void configurarListeners() {
-        btMeuTreino.setOnClickListener(v -> abrirTela(MeuTreino.class));
-        btPerfil.setOnClickListener(v -> abrirTela(Perfil.class));
-    }
-
-    private void abrirTela(Class<?> destino) {
-        Intent intent = new Intent(FormLogin.this, destino);
-        startActivity(intent);
+        btMeuTreino.setOnClickListener(v -> startActivity(new Intent(FormLogin.this, MeuTreino.class)));
+        btPerfil.setOnClickListener(v -> startActivity(new Intent(FormLogin.this, Perfil.class)));
     }
 }

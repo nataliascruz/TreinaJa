@@ -8,9 +8,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class AdicionarTreino extends AppCompatActivity {
+public class AdicionarTreino extends NavigationActivity {
     private static final int MAX_EXERCICIOS = 8;
     private static final String PREFS_NAME = "MeusTreinosPrefs";
     private static final String TREINO_PREFIX = "Treino: ";
@@ -24,9 +23,8 @@ public class AdicionarTreino extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adicionar_treino);
-
         inicializarViews();
-        carregarDadosIniciais();
+        carregarDados();
         configurarListeners();
     }
 
@@ -37,69 +35,49 @@ public class AdicionarTreino extends AppCompatActivity {
         editNumRepeticoes = findViewById(R.id.caixa_num_repeticoes);
     }
 
-    private void carregarDadosIniciais() {
+    private void carregarDados() {
         treinoSelecionado = getIntent().getStringExtra("TREINO_SELECIONADO");
         modoEdicao = getIntent().getBooleanExtra("MODO_EDICAO", false);
-
-        if (modoEdicao) {
-            carregarTreinoExistente();
-        }
+        if (modoEdicao) carregarTreinoExistente();
     }
 
     private void carregarTreinoExistente() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        treinoAtual = sharedPreferences.getString(treinoSelecionado, "");
-
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        treinoAtual = prefs.getString(treinoSelecionado, "");
         if (!treinoAtual.isEmpty()) {
             exercicioCount = treinoAtual.split("\n").length - 1;
-            String[] linhas = treinoAtual.split("\n");
-            String nomeTreino = linhas[0].replace(TREINO_PREFIX, "").trim();
-
-            editNomeTreino.setText(nomeTreino);
+            editNomeTreino.setText(treinoAtual.split("\n")[0].replace(TREINO_PREFIX, "").trim());
             editNomeTreino.setEnabled(false);
-
-            verificarLimiteExercicios();
-        }
-    }
-
-    private void verificarLimiteExercicios() {
-        if (exercicioCount >= MAX_EXERCICIOS) {
-            Toast.makeText(this, "Este treino já atingiu o limite de 8 exercícios", Toast.LENGTH_LONG).show();
-            finish();
+            if (exercicioCount >= MAX_EXERCICIOS) {
+                Toast.makeText(this, "Limite de 8 exercícios atingido", Toast.LENGTH_LONG).show();
+                finish();
+            }
         }
     }
 
     private void configurarListeners() {
-        ImageView setaVoltar = findViewById(R.id.seta_voltar);
-        Button salvarButton = findViewById(R.id.salvar_bt);
-
-        setaVoltar.setOnClickListener(v -> {
-            setResult(RESULT_CANCELED);
-            finish();
-        });
-
-        salvarButton.setOnClickListener(v -> salvarTreino());
+        setupBackButton(findViewById(R.id.seta_voltar_adicionar_treino));
+        findViewById(R.id.person_image_adicionar_treino).setOnClickListener(v -> navigateTo(Perfil.class));
+        findViewById(R.id.salvar_bt).setOnClickListener(v -> salvarTreino());
     }
 
     private void salvarTreino() {
         if (!validarCampos()) return;
 
-        try {
-            String nomeTreino = editNomeTreino.getText().toString();
-            String exercicioFormatado = formatarExercicio();
+        String nomeTreino = editNomeTreino.getText().toString();
+        String exercicio = formatarExercicio();
+        treinoAtual = treinoAtual.isEmpty()
+                ? TREINO_PREFIX + nomeTreino + "\n" + exercicio
+                : treinoAtual + "\n" + exercicio;
 
-            atualizarTreinoAtual(nomeTreino, exercicioFormatado);
-            exercicioCount = treinoAtual.split("\n").length - 1;
-
-            if (exercicioCount >= MAX_EXERCICIOS) {
-                Toast.makeText(this, "Você atingiu o limite máximo de 8 exercícios", Toast.LENGTH_LONG).show();
-                finalizarAdicaoTreino(treinoAtual);
-                return;
-            }
-
-            decidirProximoPasso();
-        } catch (Exception e) {
-            mostrarErro("Erro ao salvar treino: " + e.getMessage());
+        exercicioCount = treinoAtual.split("\n").length - 1;
+        if (exercicioCount >= MAX_EXERCICIOS) {
+            Toast.makeText(this, "Limite máximo de 8 exercícios", Toast.LENGTH_LONG).show();
+            finalizar(treinoAtual);
+        } else if (modoEdicao) {
+            finalizar(treinoAtual);
+        } else {
+            mostrarDialogoContinuar();
         }
     }
 
@@ -108,8 +86,7 @@ public class AdicionarTreino extends AppCompatActivity {
                 editNomeExercicio.getText().toString().isEmpty() ||
                 editNumSeries.getText().toString().isEmpty() ||
                 editNumRepeticoes.getText().toString().isEmpty()) {
-
-            mostrarErro("Preencha todos os campos!");
+            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -122,53 +99,26 @@ public class AdicionarTreino extends AppCompatActivity {
                 editNumRepeticoes.getText().toString());
     }
 
-    private void atualizarTreinoAtual(String nomeTreino, String exercicioFormatado) {
-        if (modoEdicao) {
-            if (treinoAtual.isEmpty()) {
-                treinoAtual = TREINO_PREFIX + nomeTreino;
-            }
-            treinoAtual += "\n" + exercicioFormatado;
-        } else {
-            treinoAtual = treinoAtual.isEmpty()
-                    ? TREINO_PREFIX + nomeTreino + "\n" + exercicioFormatado
-                    : treinoAtual + "\n" + exercicioFormatado;
-        }
-    }
-
-    private void decidirProximoPasso() {
-        if (!modoEdicao) {
-            mostrarDialogoContinuar();
-        } else {
-            finalizarAdicaoTreino(treinoAtual);
-        }
-    }
-
     private void mostrarDialogoContinuar() {
         new AlertDialog.Builder(this)
                 .setTitle("Exercício adicionado")
-                .setMessage("Deseja adicionar mais um exercício?")
-                .setPositiveButton("Sim", (dialog, which) -> limparCamposExercicio())
-                .setNegativeButton("Não", (dialog, which) -> finalizarAdicaoTreino(treinoAtual))
-                .setCancelable(false)
+                .setMessage("Adicionar mais um exercício?")
+                .setPositiveButton("Sim", (d, w) -> limparCampos())
+                .setNegativeButton("Não", (d, w) -> finalizar(treinoAtual))
                 .show();
     }
 
-    private void limparCamposExercicio() {
+    private void limparCampos() {
         editNomeExercicio.setText("");
         editNumSeries.setText("");
         editNumRepeticoes.setText("");
-        editNomeExercicio.requestFocus();
     }
 
-    private void mostrarErro(String mensagem) {
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
-    }
-
-    private void finalizarAdicaoTreino(String treinoCompleto) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("TREINO_SELECIONADO", treinoSelecionado);
-        resultIntent.putExtra("NOVO_TREINO", treinoCompleto);
-        setResult(RESULT_OK, resultIntent);
+    private void finalizar(String treino) {
+        Intent result = new Intent();
+        result.putExtra("TREINO_SELECIONADO", treinoSelecionado);
+        result.putExtra("NOVO_TREINO", treino);
+        setResult(RESULT_OK, result);
         finish();
     }
 }
