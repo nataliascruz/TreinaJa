@@ -24,6 +24,7 @@
         android:id="@+id/seta_image_perfil"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/seta"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -50,9 +51,11 @@
         android:layout_marginTop="32dp"
         android:background="@drawable/edit_text"
         android:hint="@string/nome"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_perfil" />
+        app:layout_constraintTop_toBottomOf="@id/text_perfil"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/peso"
@@ -60,36 +63,39 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/edit_text"
         android:hint="@string/peso"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/idade" />
+        app:layout_constraintTop_toBottomOf="@id/idade"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/altura"
         style="@style/Edit_Text"
-        android:layout_width="331dp"
-        android:layout_height="63dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/edit_text"
         android:hint="@string/altura"
+        android:importantForAutofill="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/peso"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/objetivo"
         style="@style/Edit_Text"
-        android:layout_width="331dp"
-        android:layout_height="63dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/edit_text"
         android:hint="@string/objetivo"
+        android:importantForAutofill="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.387"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/altura"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/idade"
@@ -97,10 +103,12 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/edit_text"
         android:hint="@string/idade"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.387"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/caixa_nome" />
+        app:layout_constraintTop_toBottomOf="@id/caixa_nome"
+        tools:ignore="TextFields" />
 
     <Button
         android:id="@+id/salvar_dados_pessoais_bt"

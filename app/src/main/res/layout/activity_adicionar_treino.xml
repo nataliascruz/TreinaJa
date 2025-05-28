@@ -24,6 +24,7 @@
         android:id="@+id/person_image_adicionar_treino"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/person"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -51,9 +52,11 @@
         android:layout_marginTop="160dp"
         android:background="@drawable/edit_text"
         android:hint="@string/nome_do_treino"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_adicionar_treino" />
+        app:layout_constraintTop_toBottomOf="@id/text_adicionar_treino"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/caixa_nome_exercicio"
@@ -61,9 +64,11 @@
         android:layout_marginTop="176dp"
         android:background="@drawable/edit_text"
         android:hint="@string/nome_do_exercicio"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/caixa_num_serie"
@@ -71,10 +76,12 @@
         android:layout_marginTop="120dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_series"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.637"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/caixa_nome_exercicio" />
+        app:layout_constraintTop_toBottomOf="@id/caixa_nome_exercicio"
+        tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/caixa_num_repeticoes"
@@ -82,9 +89,11 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_repeticoes"
+        android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/caixa_num_serie" />
+        app:layout_constraintTop_toBottomOf="@id/caixa_num_serie"
+        tools:ignore="TextFields" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/salvar_bt"
