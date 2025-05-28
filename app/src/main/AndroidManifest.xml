@@ -13,25 +13,25 @@
         android:theme="@style/Theme.Treino"
         tools:targetApi="31">
         <activity
-            android:name=".EditarExercicio"
+            android:name=".activities.EditarExercicio"
             android:exported="false" />
         <activity
-            android:name=".Perfil"
+            android:name=".activities.Perfil"
             android:exported="false" />
         <activity
-            android:name=".Concluido"
+            android:name=".activities.Concluido"
             android:exported="false" />
         <activity
-            android:name=".AdicionarTreino"
+            android:name=".activities.AdicionarTreino"
             android:exported="false" />
         <activity
-            android:name=".MeuTreino"
+            android:name=".activities.MeuTreino"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".FormLogin"
+            android:name=".activities.FormLogin"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

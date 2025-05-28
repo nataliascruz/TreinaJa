@@ -1,4 +1,4 @@
-package com.example.treino;
+package com.example.treino.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
+
+import com.example.treino.R;
 
 public class MeuTreino extends NavigationActivity {
     private TextView caixaDeTexto;

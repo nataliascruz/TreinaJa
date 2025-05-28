@@ -1,4 +1,4 @@
-package com.example.treino;
+package com.example.treino.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.content.SharedPreferences;
 import androidx.appcompat.app.AlertDialog;
+
+import com.example.treino.R;
 
 public class AdicionarTreino extends NavigationActivity {
     private static final int MAX_EXERCICIOS = 8;

@@ -1,10 +1,12 @@
-package com.example.treino;
+package com.example.treino.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.treino.R;
 
 public class Perfil extends NavigationActivity {
     private EditText caixaNome, idade, peso, altura, objetivo;
