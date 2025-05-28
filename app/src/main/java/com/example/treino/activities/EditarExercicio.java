@@ -1,11 +1,11 @@
-package com.example.treino;
+package com.example.treino.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.treino.R;
 
 public class EditarExercicio extends NavigationActivity {
     private EditText editNomeExercicio, editSeries, editRepeticoes;

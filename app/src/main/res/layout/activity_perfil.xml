@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_back"
-    tools:context=".Perfil">
+    tools:context=".activities.Perfil">
 
     <Button
         android:id="@+id/editar_dados_pessoais_bt"

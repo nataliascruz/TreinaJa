@@ -1,4 +1,4 @@
-package com.example.treino;
+package com.example.treino.activities;
 
 import android.content.Intent;
 import android.widget.ImageView;
