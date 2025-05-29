@@ -14,9 +14,7 @@ import com.example.treino.database.DataBaseHelper;
 public class EditarExercicio extends NavigationActivity {
     private EditText editNomeExercicio, editSeries, editRepeticoes;
     private DataBaseHelper dbHelper;
-    private String treinoKey;
-    private int exercicioIndex;
-    private long exercicioId;
+    private long exercicioId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,65 +34,40 @@ public class EditarExercicio extends NavigationActivity {
 
     private void carregarDados() {
         Intent intent = getIntent();
-        if (intent == null) {
-            Toast.makeText(this, "Intent inválida", Toast.LENGTH_SHORT).show();
+        if (intent == null || !intent.hasExtra("EXERCICIO_ID")) {
+            Toast.makeText(this, "Dados do exercício não encontrados", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        treinoKey = intent.getStringExtra("TREINO_KEY");
-        exercicioIndex = intent.getIntExtra("EXERCICIO_INDEX", -1);
-        String nomeExercicio = intent.getStringExtra("NOME_EXERCICIO");
-        String series = intent.getStringExtra("SERIES");
-        String repeticoes = intent.getStringExtra("REPETICOES");
-
-        if (nomeExercicio != null && series != null && repeticoes != null) {
-            editNomeExercicio.setText(nomeExercicio);
-            editSeries.setText(series);
-            editRepeticoes.setText(repeticoes);
+        exercicioId = intent.getLongExtra("EXERCICIO_ID", -1);
+        if (exercicioId == -1) {
+            Toast.makeText(this, "ID do exercício inválido", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        db.beginTransaction();
         try {
-            Cursor treinoCursor = db.query("treino",
-                    new String[]{"id"},
-                    "tipo = ? AND usuario_id = ?",
-                    new String[]{treinoKey, String.valueOf(1)},
+            Cursor cursor = db.query("exercicio",
+                    new String[]{"nome", "series", "repeticoes"},
+                    "id = ?",
+                    new String[]{String.valueOf(exercicioId)},
                     null, null, null);
 
-            if (!treinoCursor.moveToFirst()) {
-                Toast.makeText(this, "Treino não encontrado", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-
-            long treinoId = treinoCursor.getLong(0);
-            treinoCursor.close();
-
-            String query = "SELECT id, nome, series, repeticoes FROM exercicio WHERE treino_id = ? ORDER BY ordem LIMIT 1 OFFSET ?";
-            Cursor exercicioCursor = db.rawQuery(query,
-                    new String[]{String.valueOf(treinoId), String.valueOf(exercicioIndex - 1)});
-
-            if (!exercicioCursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
+                editNomeExercicio.setText(cursor.getString(0));
+                editSeries.setText(String.valueOf(cursor.getInt(1)));
+                editRepeticoes.setText(String.valueOf(cursor.getInt(2)));
+            } else {
                 Toast.makeText(this, "Exercício não encontrado", Toast.LENGTH_SHORT).show();
                 finish();
-                return;
             }
-
-            exercicioId = exercicioCursor.getLong(0);
-            editNomeExercicio.setText(exercicioCursor.getString(1));
-            editSeries.setText(String.valueOf(exercicioCursor.getInt(2)));
-            editRepeticoes.setText(String.valueOf(exercicioCursor.getInt(3)));
-            exercicioCursor.close();
-            db.setTransactionSuccessful();
+            cursor.close();
         } catch (Exception e) {
-            Toast.makeText(this, "Erro ao carregar dados", Toast.LENGTH_LONG).show();
-            Log.e("EditarExercicio", "Erro em carregarDados", e);
+            Toast.makeText(this, "Erro ao carregar exercício", Toast.LENGTH_SHORT).show();
+            Log.e("EditarExercicio", "Erro ao carregar dados", e);
             finish();
-        } finally {
-            db.endTransaction();
         }
     }
 
@@ -139,7 +112,10 @@ public class EditarExercicio extends NavigationActivity {
     }
 
     private void salvarEdicao() {
-        if (!validarCampos()) return;
+        if (exercicioId == -1) {
+            Toast.makeText(this, "ID do exercício inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
@@ -150,21 +126,14 @@ public class EditarExercicio extends NavigationActivity {
             values.put("repeticoes", Integer.parseInt(editRepeticoes.getText().toString()));
 
             int rowsAffected = db.update("exercicio", values, "id = ?", new String[]{String.valueOf(exercicioId)});
+            db.setTransactionSuccessful();
 
             if (rowsAffected > 0) {
-                Intent result = new Intent();
-                result.putExtra("TREINO_KEY", treinoKey);
-                result.putExtra("EXERCICIO_INDEX", exercicioIndex);
-                result.putExtra("EXERCICIO_EDITADO",
-                        String.format("• %s – %sx%s",
-                                editNomeExercicio.getText().toString().trim(),
-                                editSeries.getText().toString().trim(),
-                                editRepeticoes.getText().toString().trim()));
-                setResult(RESULT_OK, result);
-                db.setTransactionSuccessful();
+                Toast.makeText(this, "Exercício atualizado com sucesso", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
                 finish();
             } else {
-                Toast.makeText(this, "Nenhum exercício foi atualizado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Falha ao atualizar exercício", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_LONG).show();
