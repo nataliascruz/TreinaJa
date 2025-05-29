@@ -1,31 +1,34 @@
 package com.example.treino.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
-
 import com.example.treino.R;
+import com.example.treino.database.DataBaseHelper;
 
 public class MeuTreino extends NavigationActivity {
     private TextView caixaDeTexto;
     private Button concluirBt;
-    private SharedPreferences sharedPreferences;
-    private String currentTreino = "treino_a";
+    private DataBaseHelper dbHelper;
+    private String currentTreino = "A";
     private ActivityResultLauncher<Intent> adicionarLauncher;
     private ActivityResultLauncher<Intent> editarLauncher;
+    private final long userId = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meu_treino);
-
+        dbHelper = new DataBaseHelper(this);
         inicializarComponentes();
         registrarLaunchers();
         configurarListeners();
@@ -35,7 +38,6 @@ public class MeuTreino extends NavigationActivity {
     private void inicializarComponentes() {
         caixaDeTexto = findViewById(R.id.caixa_de_texto);
         concluirBt = findViewById(R.id.concluir_bt);
-        sharedPreferences = getSharedPreferences("MeusTreinosPrefs", MODE_PRIVATE);
     }
 
     private void registrarLaunchers() {
@@ -57,16 +59,14 @@ public class MeuTreino extends NavigationActivity {
     }
 
     private void configurarListeners() {
-        findViewById(R.id.treinoA).setOnClickListener(v -> switchTreino("treino_a"));
-        findViewById(R.id.treinoB).setOnClickListener(v -> switchTreino("treino_b"));
-        findViewById(R.id.treinoC).setOnClickListener(v -> switchTreino("treino_c"));
-
+        findViewById(R.id.treinoA).setOnClickListener(v -> switchTreino("A"));
+        findViewById(R.id.treinoB).setOnClickListener(v -> switchTreino("B"));
+        findViewById(R.id.treinoC).setOnClickListener(v -> switchTreino("C"));
         findViewById(R.id.adicionar_bt).setOnClickListener(v -> adicionarExercicio());
         findViewById(R.id.editar_bt).setOnClickListener(v -> mostrarDialogoEdicao());
         findViewById(R.id.excluir).setOnClickListener(v -> confirmarExclusao());
         concluirBt.setOnClickListener(v -> navigateTo(Concluido.class));
         findViewById(R.id.remover_exercicio).setOnClickListener(v -> mostrarDialogoRemocao());
-
         setupBackButton(findViewById(R.id.seta_image_meu_treino));
         findViewById(R.id.person_image_meu_treino).setOnClickListener(v -> navigateTo(Perfil.class));
     }
@@ -76,15 +76,54 @@ public class MeuTreino extends NavigationActivity {
         carregarTreino(treino);
     }
 
-    private void carregarTreino(String treino) {
-        String conteudo = sharedPreferences.getString(treino, "");
-        caixaDeTexto.setText(conteudo);
-        atualizarUI(!conteudo.isEmpty());
+    private void carregarTreino(String tipoTreino) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        StringBuilder conteudo = new StringBuilder();
+
+        Cursor treinoCursor = db.query("treino",
+                new String[]{"id"},
+                "tipo = ? AND usuario_id = ?",
+                new String[]{tipoTreino, String.valueOf(userId)},
+                null, null, null);
+
+        if (treinoCursor.moveToFirst()) {
+            long treinoId = treinoCursor.getLong(0);
+            Cursor exerciciosCursor = db.query("exercicio",
+                    new String[]{"nome", "series", "repeticoes"},
+                    "treino_id = ?",
+                    new String[]{String.valueOf(treinoId)},
+                    null, null, "ordem");
+
+            if (exerciciosCursor.moveToFirst()) {
+                conteudo.append("Treino: ").append(tipoTreino).append("\n");
+                do {
+                    conteudo.append("• ")
+                            .append(exerciciosCursor.getString(0))
+                            .append(" – ")
+                            .append(exerciciosCursor.getInt(1))
+                            .append("x")
+                            .append(exerciciosCursor.getInt(2))
+                            .append("\n");
+                } while (exerciciosCursor.moveToNext());
+            }
+            exerciciosCursor.close();
+        }
+        treinoCursor.close();
+        caixaDeTexto.setText(conteudo.toString());
+        atualizarUI(!conteudo.toString().isEmpty());
     }
 
     private void adicionarExercicio() {
-        String treino = sharedPreferences.getString(currentTreino, "");
-        if (treino.split("\n").length - 1 >= 8) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM exercicio e JOIN treino t ON e.treino_id = t.id WHERE t.tipo = ? AND t.usuario_id = ?",
+                new String[]{currentTreino, String.valueOf(userId)});
+
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+
+        if (count >= 8) {
             Toast.makeText(this, "Limite de 8 exercícios atingido", Toast.LENGTH_LONG).show();
         } else {
             Intent intent = new Intent(this, AdicionarTreino.class);
@@ -103,10 +142,22 @@ public class MeuTreino extends NavigationActivity {
     }
 
     private void excluirTreino() {
-        sharedPreferences.edit().remove(currentTreino).apply();
-        caixaDeTexto.setText("");
-        atualizarUI(false);
-        Toast.makeText(this, "Treino removido", Toast.LENGTH_SHORT).show();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor cursor = db.query("treino",
+                new String[]{"id"},
+                "tipo = ? AND usuario_id = ?",
+                new String[]{currentTreino, String.valueOf(userId)},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            long treinoId = cursor.getLong(0);
+            db.delete("exercicio", "treino_id = ?", new String[]{String.valueOf(treinoId)});
+            db.delete("treino", "id = ?", new String[]{String.valueOf(treinoId)});
+            caixaDeTexto.setText("");
+            atualizarUI(false);
+            Toast.makeText(this, "Treino removido", Toast.LENGTH_SHORT).show();
+        }
+        cursor.close();
     }
 
     private void mostrarDialogoEdicao() {
@@ -118,8 +169,7 @@ public class MeuTreino extends NavigationActivity {
 
         new AlertDialog.Builder(this)
                 .setTitle("Editar exercício")
-                .setItems(gerarOpcoes(partes), (d, w) ->
-                        abrirEdicao(currentTreino, partes[w + 1], w + 1))
+                .setItems(gerarOpcoes(partes), (d, w) -> abrirEdicao(currentTreino, partes[w + 1], w + 1))
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
@@ -147,17 +197,30 @@ public class MeuTreino extends NavigationActivity {
     }
 
     private void removerExercicio(int index) {
-        String[] partes = caixaDeTexto.getText().toString().split("\n");
-        StringBuilder novoTreino = new StringBuilder(partes[0]);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor treinoCursor = db.query("treino",
+                new String[]{"id"},
+                "tipo = ? AND usuario_id = ?",
+                new String[]{currentTreino, String.valueOf(userId)},
+                null, null, null);
 
-        for (int i = 1; i < partes.length; i++) {
-            if (i != index) novoTreino.append("\n").append(partes[i]);
+        if (treinoCursor.moveToFirst()) {
+            long treinoId = treinoCursor.getLong(0);
+            Cursor exercicioCursor = db.query("exercicio",
+                    new String[]{"id"},
+                    "treino_id = ?",
+                    new String[]{String.valueOf(treinoId)},
+                    null, null, "ordem", (index - 1) + ",1");
+
+            if (exercicioCursor.moveToFirst()) {
+                long exercicioId = exercicioCursor.getLong(0);
+                db.delete("exercicio", "id = ?", new String[]{String.valueOf(exercicioId)});
+                carregarTreino(currentTreino);
+                Toast.makeText(this, "Exercício removido", Toast.LENGTH_SHORT).show();
+            }
+            exercicioCursor.close();
         }
-
-        sharedPreferences.edit().putString(currentTreino, novoTreino.toString()).apply();
-        caixaDeTexto.setText(novoTreino.toString());
-        atualizarUI(!novoTreino.toString().isEmpty());
-        Toast.makeText(this, "Exercício removido", Toast.LENGTH_SHORT).show();
+        treinoCursor.close();
     }
 
     private void abrirEdicao(String treinoKey, String exercicio, int index) {
@@ -174,49 +237,149 @@ public class MeuTreino extends NavigationActivity {
             intent.putExtra("REPETICOES", seriesReps[1]);
             editarLauncher.launch(intent);
         } catch (Exception e) {
-            Toast.makeText(this, "Erro ao editar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erro ao editar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e("MeuTreino", "Erro em abrirEdicao", e);
         }
     }
 
     private void handleAdicionarResult(Intent data) {
-        String treino = data.getStringExtra("TREINO_SELECIONADO");
-        String conteudo = data.getStringExtra("NOVO_TREINO");
-        sharedPreferences.edit().putString(treino, conteudo).apply();
-        caixaDeTexto.setText(conteudo);
-        atualizarUI(true);
+        String tipoTreino = data.getStringExtra("TREINO_SELECIONADO");
+        String nomeTreino = data.getStringExtra("NOME_TREINO");
+        String nomeExercicio = data.getStringExtra("NOME_EXERCICIO");
+        int series = data.getIntExtra("SERIES", 0);
+        int repeticoes = data.getIntExtra("REPETICOES", 0);
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.query("treino",
+                    new String[]{"id"},
+                    "tipo = ? AND usuario_id = ?",
+                    new String[]{tipoTreino, String.valueOf(userId)},
+                    null, null, null);
+
+            long treinoId;
+            if (cursor.moveToFirst()) {
+                treinoId = cursor.getLong(0);
+            } else {
+                ContentValues treinoValues = new ContentValues();
+                treinoValues.put("nome", nomeTreino);
+                treinoValues.put("tipo", tipoTreino);
+                treinoValues.put("usuario_id", userId);
+                treinoId = db.insert("treino", null, treinoValues);
+            }
+            cursor.close();
+
+            ContentValues exercicioValues = new ContentValues();
+            exercicioValues.put("nome", nomeExercicio);
+            exercicioValues.put("series", series);
+            exercicioValues.put("repeticoes", repeticoes);
+            exercicioValues.put("ordem", getProximaOrdem(treinoId));
+            exercicioValues.put("treino_id", treinoId);
+            db.insert("exercicio", null, exercicioValues);
+            db.setTransactionSuccessful();
+            carregarTreino(tipoTreino);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao adicionar exercício", Toast.LENGTH_LONG).show();
+            Log.e("MeuTreino", "Erro em handleAdicionarResult", e);
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    private int getProximaOrdem(long treinoId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT MAX(ordem) FROM exercicio WHERE treino_id = ?",
+                new String[]{String.valueOf(treinoId)});
+
+        int ordem = 0;
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            ordem = cursor.getInt(0) + 1;
+        }
+        cursor.close();
+        return ordem;
     }
 
     private void handleEditarResult(Intent data) {
-        String treinoKey = data.getStringExtra("TREINO_KEY");
-        int index = data.getIntExtra("EXERCICIO_INDEX", 0);
-        String exercicio = data.getStringExtra("EXERCICIO_EDITADO");
+        if (data == null) return;
 
-        String[] partes = sharedPreferences.getString(treinoKey, "").split("\n");
-        if (partes.length > 1 && index >= 1 && index < partes.length) {
-            partes[index] = exercicio;
-            String novoConteudo = TextUtils.join("\n", partes);
-            sharedPreferences.edit().putString(treinoKey, novoConteudo).apply();
-            caixaDeTexto.setText(novoConteudo);
-            atualizarUI(true);
-        } else {
-            Toast.makeText(this, "Índice inválido", Toast.LENGTH_SHORT).show();
+        String treinoKey = data.getStringExtra("TREINO_KEY");
+        int index = data.getIntExtra("EXERCICIO_INDEX", -1);
+        String exercicioEditado = data.getStringExtra("EXERCICIO_EDITADO");
+
+        if (treinoKey == null || exercicioEditado == null || index == -1) {
+            Toast.makeText(this, "Dados de edição inválidos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            Cursor treinoCursor = db.query("treino",
+                    new String[]{"id"},
+                    "tipo = ? AND usuario_id = ?",
+                    new String[]{treinoKey, String.valueOf(userId)},
+                    null, null, null);
+
+            if (!treinoCursor.moveToFirst()) {
+                Toast.makeText(this, "Treino não encontrado", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long treinoId = treinoCursor.getLong(0);
+            treinoCursor.close();
+
+            String query = "SELECT id FROM exercicio WHERE treino_id = ? ORDER BY ordem LIMIT 1 OFFSET ?";
+            Cursor exercicioCursor = db.rawQuery(query,
+                    new String[]{String.valueOf(treinoId), String.valueOf(index - 1)});
+
+            if (!exercicioCursor.moveToFirst()) {
+                Toast.makeText(this, "Exercício não encontrado", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long exercicioId = exercicioCursor.getLong(0);
+            exercicioCursor.close();
+
+            String[] partes = exercicioEditado.split(" – ");
+            String nome = partes[0].replace("• ", "").trim();
+            String[] seriesReps = partes[1].split("x");
+
+            ContentValues values = new ContentValues();
+            values.put("nome", nome);
+            values.put("series", Integer.parseInt(seriesReps[0].trim()));
+            values.put("repeticoes", Integer.parseInt(seriesReps[1].trim()));
+
+            db.update("exercicio", values, "id = ?", new String[]{String.valueOf(exercicioId)});
+            db.setTransactionSuccessful();
+            carregarTreino(treinoKey);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao salvar edição: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e("MeuTreino", "Erro em handleEditarResult", e);
+        } finally {
+            db.endTransaction();
         }
     }
 
     private void atualizarUI(boolean habilitado) {
         boolean temConteudo = !caixaDeTexto.getText().toString().trim().isEmpty();
-
-        caixaDeTexto.setEnabled(habilitado);
         float alpha = habilitado ? 1f : 0.5f;
 
+        caixaDeTexto.setEnabled(habilitado);
         findViewById(R.id.editar_bt).setEnabled(habilitado);
         findViewById(R.id.editar_bt).setAlpha(alpha);
         findViewById(R.id.excluir).setEnabled(habilitado);
         findViewById(R.id.excluir).setAlpha(alpha);
         findViewById(R.id.remover_exercicio).setEnabled(habilitado);
         findViewById(R.id.remover_exercicio).setAlpha(alpha);
-
         concluirBt.setEnabled(habilitado && temConteudo);
         concluirBt.setAlpha(habilitado && temConteudo ? 1f : 0.5f);
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 }
