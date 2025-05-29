@@ -1,23 +1,28 @@
 package com.example.treino.activities;
 
-import android.content.SharedPreferences;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.treino.R;
+import com.example.treino.database.DataBaseHelper;
 
 public class Perfil extends NavigationActivity {
     private EditText caixaNome, idade, peso, altura, objetivo;
     private Button salvarBt, editarBt;
-    private static final String PREFS_NAME = "DadosUsuarioPrefs";
     private boolean editando = false;
+    private DataBaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
+
+        dbHelper = new DataBaseHelper(this);
         inicializarViews();
         configurarListeners();
         carregarDados();
@@ -67,12 +72,21 @@ public class Perfil extends NavigationActivity {
     }
 
     private void carregarDados() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        caixaNome.setText(prefs.getString("nome", ""));
-        idade.setText(prefs.getString("idade", ""));
-        peso.setText(prefs.getString("peso", ""));
-        altura.setText(prefs.getString("altura", ""));
-        objetivo.setText(prefs.getString("objetivo", ""));
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                "usuario",
+                new String[]{"nome", "idade", "peso", "altura", "objetivo"},
+                null, null, null, null, null
+        );
+
+        if (cursor.moveToFirst()) {
+            caixaNome.setText(cursor.getString(0));
+            idade.setText(String.valueOf(cursor.getInt(1)));
+            peso.setText(String.valueOf(cursor.getDouble(2)));
+            altura.setText(String.valueOf(cursor.getDouble(3)));
+            objetivo.setText(cursor.getString(4));
+        }
+        cursor.close();
     }
 
     private boolean validarCampos() {
@@ -103,17 +117,34 @@ public class Perfil extends NavigationActivity {
                 throw new NumberFormatException();
             }
 
-            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putString("nome", caixaNome.getText().toString().trim());
-            editor.putString("idade", String.valueOf(idadeValor));
-            editor.putString("peso", String.valueOf(pesoValor));
-            editor.putString("altura", String.valueOf(alturaValor));
-            editor.putString("objetivo", objetivo.getText().toString().trim());
-            editor.apply();
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("nome", caixaNome.getText().toString().trim());
+            values.put("idade", idadeValor);
+            values.put("peso", pesoValor);
+            values.put("altura", alturaValor);
+            values.put("objetivo", objetivo.getText().toString().trim());
+
+            // Verifica se já existe um usuário
+            Cursor cursor = db.query("usuario", null, null, null, null, null, null);
+            if (cursor.getCount() > 0) {
+                // Atualiza o usuário existente
+                db.update("usuario", values, null, null);
+            } else {
+                // Insere um novo usuário
+                db.insert("usuario", null, values);
+            }
+            cursor.close();
 
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Verifique os valores numéricos", Toast.LENGTH_LONG).show();
             throw e;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 }

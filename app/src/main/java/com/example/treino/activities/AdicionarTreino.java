@@ -1,28 +1,30 @@
 package com.example.treino.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.content.SharedPreferences;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.treino.R;
+import com.example.treino.database.DataBaseHelper;
 
 public class AdicionarTreino extends NavigationActivity {
     private static final int MAX_EXERCICIOS = 8;
-    private static final String PREFS_NAME = "MeusTreinosPrefs";
-    private static final String TREINO_PREFIX = "Treino: ";
     private EditText editNomeTreino, editNomeExercicio, editNumSeries, editNumRepeticoes;
     private String treinoSelecionado;
-    private boolean modoEdicao = false;
-    private String treinoAtual = "";
-    private int exercicioCount = 0;
+    private DataBaseHelper dbHelper;
+    private final long userId = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adicionar_treino);
+
+        dbHelper = new DataBaseHelper(this);
         inicializarViews();
         carregarDados();
         configurarListeners();
@@ -37,22 +39,31 @@ public class AdicionarTreino extends NavigationActivity {
 
     private void carregarDados() {
         treinoSelecionado = getIntent().getStringExtra("TREINO_SELECIONADO");
-        modoEdicao = getIntent().getBooleanExtra("MODO_EDICAO", false);
-        if (modoEdicao) carregarTreinoExistente();
-    }
 
-    private void carregarTreinoExistente() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        treinoAtual = prefs.getString(treinoSelecionado, "");
-        if (!treinoAtual.isEmpty()) {
-            exercicioCount = treinoAtual.split("\n").length - 1;
-            editNomeTreino.setText(treinoAtual.split("\n")[0].replace(TREINO_PREFIX, "").trim());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("treino",
+                new String[]{"nome"},
+                "tipo = ? AND usuario_id = ?",
+                new String[]{treinoSelecionado, String.valueOf(userId)},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            editNomeTreino.setText(cursor.getString(0));
             editNomeTreino.setEnabled(false);
-            if (exercicioCount >= MAX_EXERCICIOS) {
+
+            cursor.close();
+            cursor = db.rawQuery(
+                    "SELECT COUNT(*) FROM exercicio e " +
+                            "JOIN treino t ON e.treino_id = t.id " +
+                            "WHERE t.tipo = ? AND t.usuario_id = ?",
+                    new String[]{treinoSelecionado, String.valueOf(userId)});
+
+            if (cursor.moveToFirst() && cursor.getInt(0) >= MAX_EXERCICIOS) {
                 Toast.makeText(this, "Limite de 8 exercícios atingido", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
+        cursor.close();
     }
 
     private void configurarListeners() {
@@ -64,47 +75,110 @@ public class AdicionarTreino extends NavigationActivity {
     private void salvarTreino() {
         if (!validarCampos()) return;
 
-        String nomeTreino = editNomeTreino.getText().toString();
-        String exercicio = formatarExercicio();
-        treinoAtual = treinoAtual.isEmpty()
-                ? TREINO_PREFIX + nomeTreino + "\n" + exercicio
-                : treinoAtual + "\n" + exercicio;
+        String nomeTreino = editNomeTreino.getText().toString().trim();
+        String nomeExercicio = editNomeExercicio.getText().toString().trim();
+        int series = Integer.parseInt(editNumSeries.getText().toString());
+        int repeticoes = Integer.parseInt(editNumRepeticoes.getText().toString());
 
-        exercicioCount = treinoAtual.split("\n").length - 1;
-        if (exercicioCount >= MAX_EXERCICIOS) {
-            Toast.makeText(this, "Limite máximo de 8 exercícios", Toast.LENGTH_LONG).show();
-            finalizar(treinoAtual);
-        } else if (modoEdicao) {
-            finalizar(treinoAtual);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor cursor = db.query("treino",
+                new String[]{"id"},
+                "tipo = ? AND usuario_id = ?",
+                new String[]{treinoSelecionado, String.valueOf(userId)},
+                null, null, null);
+
+        long treinoId;
+
+        if (cursor.moveToFirst()) {
+            treinoId = cursor.getLong(0);
         } else {
-            mostrarDialogoContinuar();
+            // Cria um novo treino
+            ContentValues treinoValues = new ContentValues();
+            treinoValues.put("nome", nomeTreino);
+            treinoValues.put("tipo", treinoSelecionado);
+            treinoValues.put("usuario_id", userId);
+            treinoId = db.insert("treino", null, treinoValues);
         }
+        cursor.close();
+
+        ContentValues exercicioValues = new ContentValues();
+        exercicioValues.put("nome", nomeExercicio);
+        exercicioValues.put("series", series);
+        exercicioValues.put("repeticoes", repeticoes);
+        exercicioValues.put("ordem", getProximaOrdem(treinoId));
+        exercicioValues.put("treino_id", treinoId);
+        db.insert("exercicio", null, exercicioValues);
+
+        cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM exercicio WHERE treino_id = ?",
+                new String[]{String.valueOf(treinoId)});
+
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+
+        if (count >= MAX_EXERCICIOS) {
+            finalizar(nomeTreino, nomeExercicio, series, repeticoes);
+        } else {
+            mostrarDialogoContinuar(nomeTreino, nomeExercicio, series, repeticoes);
+        }
+    }
+
+    private int getProximaOrdem(long treinoId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT MAX(ordem) FROM exercicio WHERE treino_id = ?",
+                new String[]{String.valueOf(treinoId)});
+
+        int ordem = 0;
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            ordem = cursor.getInt(0) + 1;
+        }
+        cursor.close();
+        return ordem;
     }
 
     private boolean validarCampos() {
-        if (editNomeTreino.getText().toString().isEmpty() ||
-                editNomeExercicio.getText().toString().isEmpty() ||
-                editNumSeries.getText().toString().isEmpty() ||
-                editNumRepeticoes.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+        if (editNomeTreino.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Informe o nome do treino", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (editNomeExercicio.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Informe o nome do exercício", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (editNumSeries.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Informe o número de séries", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (editNumRepeticoes.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Informe o número de repetições", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        try {
+            int series = Integer.parseInt(editNumSeries.getText().toString());
+            int repeticoes = Integer.parseInt(editNumRepeticoes.getText().toString());
+
+            if (series <= 0 || repeticoes <= 0) {
+                Toast.makeText(this, "Séries e repetições devem ser maiores que zero", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Valores inválidos para séries/repetições", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         return true;
     }
 
-    private String formatarExercicio() {
-        return String.format("• %s – %sx%s",
-                editNomeExercicio.getText().toString(),
-                editNumSeries.getText().toString(),
-                editNumRepeticoes.getText().toString());
-    }
-
-    private void mostrarDialogoContinuar() {
+    private void mostrarDialogoContinuar(String nomeTreino, String nomeExercicio, int series, int repeticoes) {
         new AlertDialog.Builder(this)
                 .setTitle("Exercício adicionado")
                 .setMessage("Adicionar mais um exercício?")
                 .setPositiveButton("Sim", (d, w) -> limparCampos())
-                .setNegativeButton("Não", (d, w) -> finalizar(treinoAtual))
+                .setNegativeButton("Não", (d, w) -> finalizar(nomeTreino, nomeExercicio, series, repeticoes))
                 .show();
     }
 
@@ -112,13 +186,23 @@ public class AdicionarTreino extends NavigationActivity {
         editNomeExercicio.setText("");
         editNumSeries.setText("");
         editNumRepeticoes.setText("");
+        editNomeExercicio.requestFocus();
     }
 
-    private void finalizar(String treino) {
+    private void finalizar(String nomeTreino, String nomeExercicio, int series, int repeticoes) {
         Intent result = new Intent();
         result.putExtra("TREINO_SELECIONADO", treinoSelecionado);
-        result.putExtra("NOVO_TREINO", treino);
+        result.putExtra("NOME_TREINO", nomeTreino);
+        result.putExtra("NOME_EXERCICIO", nomeExercicio);
+        result.putExtra("SERIES", series);
+        result.putExtra("REPETICOES", repeticoes);
         setResult(RESULT_OK, result);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 }
