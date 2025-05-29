@@ -1,6 +1,5 @@
 package com.example.treino.activities;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
-
 import com.example.treino.R;
 import com.example.treino.database.DataBaseHelper;
 
@@ -23,7 +21,6 @@ public class AdicionarTreino extends NavigationActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adicionar_treino);
-
         dbHelper = new DataBaseHelper(this);
         inicializarViews();
         carregarDados();
@@ -50,18 +47,6 @@ public class AdicionarTreino extends NavigationActivity {
         if (cursor.moveToFirst()) {
             editNomeTreino.setText(cursor.getString(0));
             editNomeTreino.setEnabled(false);
-
-            cursor.close();
-            cursor = db.rawQuery(
-                    "SELECT COUNT(*) FROM exercicio e " +
-                            "JOIN treino t ON e.treino_id = t.id " +
-                            "WHERE t.tipo = ? AND t.usuario_id = ?",
-                    new String[]{treinoSelecionado, String.valueOf(userId)});
-
-            if (cursor.moveToFirst() && cursor.getInt(0) >= MAX_EXERCICIOS) {
-                Toast.makeText(this, "Limite de 8 exercícios atingido", Toast.LENGTH_LONG).show();
-                finish();
-            }
         }
         cursor.close();
     }
@@ -80,63 +65,35 @@ public class AdicionarTreino extends NavigationActivity {
         int series = Integer.parseInt(editNumSeries.getText().toString());
         int repeticoes = Integer.parseInt(editNumRepeticoes.getText().toString());
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        Cursor cursor = db.query("treino",
-                new String[]{"id"},
-                "tipo = ? AND usuario_id = ?",
-                new String[]{treinoSelecionado, String.valueOf(userId)},
-                null, null, null);
-
-        long treinoId;
-
-        if (cursor.moveToFirst()) {
-            treinoId = cursor.getLong(0);
-        } else {
-            // Cria um novo treino
-            ContentValues treinoValues = new ContentValues();
-            treinoValues.put("nome", nomeTreino);
-            treinoValues.put("tipo", treinoSelecionado);
-            treinoValues.put("usuario_id", userId);
-            treinoId = db.insert("treino", null, treinoValues);
-        }
-        cursor.close();
-
-        ContentValues exercicioValues = new ContentValues();
-        exercicioValues.put("nome", nomeExercicio);
-        exercicioValues.put("series", series);
-        exercicioValues.put("repeticoes", repeticoes);
-        exercicioValues.put("ordem", getProximaOrdem(treinoId));
-        exercicioValues.put("treino_id", treinoId);
-        db.insert("exercicio", null, exercicioValues);
-
-        cursor = db.rawQuery(
-                "SELECT COUNT(*) FROM exercicio WHERE treino_id = ?",
-                new String[]{String.valueOf(treinoId)});
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM exercicio e JOIN treino t ON e.treino_id = t.id " +
+                        "WHERE t.tipo = ? AND t.usuario_id = ?",
+                new String[]{treinoSelecionado, String.valueOf(userId)});
 
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();
 
         if (count >= MAX_EXERCICIOS) {
-            finalizar(nomeTreino, nomeExercicio, series, repeticoes);
-        } else {
-            mostrarDialogoContinuar(nomeTreino, nomeExercicio, series, repeticoes);
+            Toast.makeText(this, "Limite de exercícios atingido", Toast.LENGTH_SHORT).show();
+            return;
         }
-    }
 
-    private int getProximaOrdem(long treinoId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(
-                "SELECT MAX(ordem) FROM exercicio WHERE treino_id = ?",
-                new String[]{String.valueOf(treinoId)});
+        Intent result = new Intent();
+        result.putExtra("TREINO_SELECIONADO", treinoSelecionado);
+        result.putExtra("NOME_TREINO", nomeTreino);
+        result.putExtra("NOME_EXERCICIO", nomeExercicio);
+        result.putExtra("SERIES", series);
+        result.putExtra("REPETICOES", repeticoes);
+        setResult(RESULT_OK, result);
 
-        int ordem = 0;
-        if (cursor.moveToFirst() && !cursor.isNull(0)) {
-            ordem = cursor.getInt(0) + 1;
-        }
-        cursor.close();
-        return ordem;
+        new AlertDialog.Builder(this)
+                .setTitle("Exercício adicionado")
+                .setMessage("Adicionar mais um exercício?")
+                .setPositiveButton("Sim", (d, w) -> limparCampos())
+                .setNegativeButton("Não", (d, w) -> finish())
+                .show();
     }
 
     private boolean validarCampos() {
@@ -173,31 +130,11 @@ public class AdicionarTreino extends NavigationActivity {
         return true;
     }
 
-    private void mostrarDialogoContinuar(String nomeTreino, String nomeExercicio, int series, int repeticoes) {
-        new AlertDialog.Builder(this)
-                .setTitle("Exercício adicionado")
-                .setMessage("Adicionar mais um exercício?")
-                .setPositiveButton("Sim", (d, w) -> limparCampos())
-                .setNegativeButton("Não", (d, w) -> finalizar(nomeTreino, nomeExercicio, series, repeticoes))
-                .show();
-    }
-
     private void limparCampos() {
         editNomeExercicio.setText("");
         editNumSeries.setText("");
         editNumRepeticoes.setText("");
         editNomeExercicio.requestFocus();
-    }
-
-    private void finalizar(String nomeTreino, String nomeExercicio, int series, int repeticoes) {
-        Intent result = new Intent();
-        result.putExtra("TREINO_SELECIONADO", treinoSelecionado);
-        result.putExtra("NOME_TREINO", nomeTreino);
-        result.putExtra("NOME_EXERCICIO", nomeExercicio);
-        result.putExtra("SERIES", series);
-        result.putExtra("REPETICOES", repeticoes);
-        setResult(RESULT_OK, result);
-        finish();
     }
 
     @Override
