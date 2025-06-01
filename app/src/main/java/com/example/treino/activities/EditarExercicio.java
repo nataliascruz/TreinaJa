@@ -5,16 +5,20 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.treino.R;
 import com.example.treino.database.DataBaseHelper;
+import java.util.regex.Pattern;
 
 public class EditarExercicio extends NavigationActivity {
     private EditText editNomeExercicio, editSeries, editRepeticoes;
     private DataBaseHelper dbHelper;
     private long exercicioId = -1;
+    private String nomeOriginal, seriesOriginal, repeticoesOriginal;
+    private static final Pattern CHARACTER_PATTERN = Pattern.compile("^[a-zA-Z0-9 ]*$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +26,9 @@ public class EditarExercicio extends NavigationActivity {
         setContentView(R.layout.activity_editar_exercicio);
         dbHelper = new DataBaseHelper(this);
         inicializarViews();
-        carregarDados();
+        carregarDadosExercicio();
         configurarListeners();
+        configurarValidacoes();
     }
 
     private void inicializarViews() {
@@ -32,78 +37,129 @@ public class EditarExercicio extends NavigationActivity {
         editRepeticoes = findViewById(R.id.edit_repeticoes);
     }
 
-    private void carregarDados() {
+    private void carregarDadosExercicio() {
         Intent intent = getIntent();
         if (intent == null || !intent.hasExtra("EXERCICIO_ID")) {
-            Toast.makeText(this, "Dados do exercício não encontrados", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erro: Dados do exercício não encontrados.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
         exercicioId = intent.getLongExtra("EXERCICIO_ID", -1);
         if (exercicioId == -1) {
-            Toast.makeText(this, "ID do exercício inválido", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erro: ID do exercício inválido.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
         try {
-            Cursor cursor = db.query("exercicio",
-                    new String[]{"nome", "series", "repeticoes"},
-                    "id = ?",
+            cursor = db.query(DataBaseHelper.TABLE_EXERCICIO,
+                    new String[]{DataBaseHelper.COLUMN_EXERCICIO_NOME, DataBaseHelper.COLUMN_SERIES, DataBaseHelper.COLUMN_REPETICOES},
+                    DataBaseHelper.COLUMN_EXERCICIO_ID + " = ?",
                     new String[]{String.valueOf(exercicioId)},
                     null, null, null);
 
-            if (cursor.moveToFirst()) {
-                editNomeExercicio.setText(cursor.getString(0));
-                editSeries.setText(String.valueOf(cursor.getInt(1)));
-                editRepeticoes.setText(String.valueOf(cursor.getInt(2)));
+            if (cursor != null && cursor.moveToFirst()) {
+                nomeOriginal = cursor.getString(0);
+                seriesOriginal = String.valueOf(cursor.getInt(1));
+                repeticoesOriginal = String.valueOf(cursor.getInt(2));
+
+                editNomeExercicio.setText(nomeOriginal);
+                editSeries.setText(seriesOriginal);
+                editRepeticoes.setText(repeticoesOriginal);
             } else {
-                Toast.makeText(this, "Exercício não encontrado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Exercício não encontrado.", Toast.LENGTH_SHORT).show();
                 finish();
             }
-            cursor.close();
         } catch (Exception e) {
-            Toast.makeText(this, "Erro ao carregar exercício", Toast.LENGTH_SHORT).show();
-            Log.e("EditarExercicio", "Erro ao carregar dados", e);
+            Toast.makeText(this, "Erro ao carregar exercício.", Toast.LENGTH_SHORT).show();
             finish();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
     private void configurarListeners() {
         setupBackButton(findViewById(R.id.seta_voltar_edit));
+        findViewById(R.id.person_image).setOnClickListener(v -> navigateTo(Perfil.class));
         findViewById(R.id.btn_cancelar).setOnClickListener(v -> finish());
         findViewById(R.id.btn_salvar).setOnClickListener(v -> {
-            if (validarCampos()) salvarEdicao();
+            if (validarCampos()) {
+                salvarEdicaoNoBanco();
+            }
+        });
+    }
+
+    private void configurarValidacoes() {
+        editSeries.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().matches("\\d*")) {
+                    editSeries.setText(s.toString().replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+
+        editRepeticoes.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().matches("\\d*")) {
+                    editRepeticoes.setText(s.toString().replaceAll("[^\\d]", ""));
+                }
+            }
         });
     }
 
     private boolean validarCampos() {
-        if (editNomeExercicio.getText().toString().trim().isEmpty()) {
+        String nomeExercicio = editNomeExercicio.getText().toString().trim();
+        String series = editSeries.getText().toString().trim();
+        String repeticoes = editRepeticoes.getText().toString().trim();
+
+        if (nomeExercicio.isEmpty()) {
             mostrarErro("Informe o nome do exercício");
             return false;
         }
-        if (editSeries.getText().toString().trim().isEmpty()) {
+        if (!CHARACTER_PATTERN.matcher(nomeExercicio).matches()) {
+            mostrarErro("Nome do exercício não pode conter caracteres especiais");
+            return false;
+        }
+
+        if (series.isEmpty()) {
             mostrarErro("Informe o número de séries");
             return false;
         }
-        if (editRepeticoes.getText().toString().trim().isEmpty()) {
+        if (repeticoes.isEmpty()) {
             mostrarErro("Informe o número de repetições");
             return false;
         }
 
         try {
-            int series = Integer.parseInt(editSeries.getText().toString());
-            int repeticoes = Integer.parseInt(editRepeticoes.getText().toString());
-            if (series <= 0 || repeticoes <= 0) {
+            int numSeries = Integer.parseInt(series);
+            int numRepeticoes = Integer.parseInt(repeticoes);
+            if (numSeries <= 0 || numRepeticoes <= 0) {
                 mostrarErro("Séries e repetições devem ser maiores que zero");
                 return false;
             }
         } catch (NumberFormatException e) {
-            mostrarErro("Valores inválidos para séries/repetições");
+            mostrarErro("Valores inválidos para séries ou repetições");
             return false;
         }
+
+        if (nomeExercicio.equals(nomeOriginal) &&
+                series.equals(seriesOriginal) &&
+                repeticoes.equals(repeticoesOriginal)) {
+            mostrarErro("Nenhuma alteração foi feita");
+            return false;
+        }
+
         return true;
     }
 
@@ -111,36 +167,40 @@ public class EditarExercicio extends NavigationActivity {
         Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
     }
 
-    private void salvarEdicao() {
-        if (exercicioId == -1) {
-            Toast.makeText(this, "ID do exercício inválido", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void salvarEdicaoNoBanco() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            values.put("nome", editNomeExercicio.getText().toString().trim());
-            values.put("series", Integer.parseInt(editSeries.getText().toString()));
-            values.put("repeticoes", Integer.parseInt(editRepeticoes.getText().toString()));
+            values.put(DataBaseHelper.COLUMN_EXERCICIO_NOME, capitalizarPrimeiraLetra(editNomeExercicio.getText().toString().trim()));
+            values.put(DataBaseHelper.COLUMN_SERIES, Integer.parseInt(editSeries.getText().toString()));
+            values.put(DataBaseHelper.COLUMN_REPETICOES, Integer.parseInt(editRepeticoes.getText().toString()));
 
-            int rowsAffected = db.update("exercicio", values, "id = ?", new String[]{String.valueOf(exercicioId)});
+            int rowsAffected = db.update(DataBaseHelper.TABLE_EXERCICIO, values,
+                    DataBaseHelper.COLUMN_EXERCICIO_ID + " = ?",
+                    new String[]{String.valueOf(exercicioId)});
+
             db.setTransactionSuccessful();
 
             if (rowsAffected > 0) {
-                Toast.makeText(this, "Exercício atualizado com sucesso", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Exercício atualizado com sucesso!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             } else {
-                Toast.makeText(this, "Falha ao atualizar exercício", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Falha ao atualizar o exercício.", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            Log.e("EditarExercicio", "Erro em salvarEdicao", e);
         } finally {
             db.endTransaction();
         }
+    }
+
+    private String capitalizarPrimeiraLetra(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return texto;
+        }
+        return texto.substring(0, 1).toUpperCase() + texto.substring(1).toLowerCase();
     }
 
     @Override

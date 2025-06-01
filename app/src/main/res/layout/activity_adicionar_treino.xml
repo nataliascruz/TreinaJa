@@ -49,44 +49,55 @@
     <EditText
         android:id="@+id/caixa_nome_treino"
         style="@style/Edit_Text"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="28dp"
         android:background="@drawable/edit_text"
         android:hint="@string/nome_do_treino"
         android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_adicionar_treino"
+        app:layout_constraintTop_toBottomOf="@+id/caixa_nome_exercicio"
         tools:ignore="TextFields" />
 
-    <EditText
-        android:id="@+id/caixa_nome_exercicio"
+    <TextView
+        android:id="@+id/text_tipo_treino"
         style="@style/Edit_Text"
-        android:layout_marginTop="176dp"
+        android:layout_marginTop="144dp"
         android:background="@drawable/edit_text"
-        android:hint="@string/nome_do_exercicio"
         android:importantForAutofill="no"
+        android:text="@string/tipo_de_treino"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="TextFields" />
 
     <EditText
+        android:id="@+id/caixa_nome_exercicio"
+        style="@style/Edit_Text"
+        android:background="@drawable/edit_text"
+        android:hint="@string/nome_do_exercicio"
+        android:importantForAutofill="no"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_tipo_treino"
+        tools:ignore="TextFields" />
+
+    <EditText
         android:id="@+id/caixa_num_serie"
         style="@style/Edit_Text"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_series"
         android:importantForAutofill="no"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.637"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/caixa_nome_exercicio"
+        app:layout_constraintTop_toBottomOf="@+id/caixa_nome_treino"
         tools:ignore="TextFields" />
 
     <EditText
         android:id="@+id/caixa_num_repeticoes"
         style="@style/Edit_Text"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_repeticoes"
         android:importantForAutofill="no"
