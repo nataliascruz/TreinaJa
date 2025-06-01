@@ -72,6 +72,7 @@ git clone https://github.com/nataliascruz/TreinaJa.git
 ---
 
 📖 Como Usar
+
 🏠 Tela Inicial (FormLogin)
 Acesse "Meu Treino" para gerenciar seus treinos.
 
