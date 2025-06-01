@@ -26,10 +26,10 @@ public class Perfil extends NavigationActivity {
     private static final String[] OBJETIVOS = {
             "Hipertrofia",
             "Emagrecimento",
-            "Força",
-            "Resistência",
+            "Forca",
+            "Resistencia",
             "Condicionamento Físico",
-            "Definição Muscular"
+            "Definicao Muscular"
     };
 
     @Override
