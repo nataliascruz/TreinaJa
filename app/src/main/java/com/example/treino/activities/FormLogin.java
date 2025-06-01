@@ -3,12 +3,12 @@ package com.example.treino.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.example.treino.R;
 
 public class FormLogin extends AppCompatActivity {
@@ -24,6 +24,12 @@ public class FormLogin extends AppCompatActivity {
         configurarInsets();
         inicializarComponentes();
         configurarListeners();
+
+        String mensagemConclusao = getIntent().getStringExtra("MENSAGEM");
+        if (mensagemConclusao != null && !mensagemConclusao.isEmpty()) {
+            Toast.makeText(this, mensagemConclusao, Toast.LENGTH_LONG).show();
+            getIntent().removeExtra("MENSAGEM");
+        }
     }
 
     private void configurarInsets() {
@@ -44,3 +50,4 @@ public class FormLogin extends AppCompatActivity {
         btPerfil.setOnClickListener(v -> startActivity(new Intent(FormLogin.this, Perfil.class)));
     }
 }
+
