@@ -39,4 +39,6 @@
     <string name="message_finalizacao_treino">Parabéns por finalizar a montagem do seu treino</string>
     <string name="remover_exercicio">Remover Exercicio</string>
     <string name="editar_dados_perfil">Editar Dados</string>
+    <string name="limpar_dados_perfil">Limpar Dados</string>
+    <string name="tipo_de_treino">Tipo de Treino</string>
 </resources>
