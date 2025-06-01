@@ -168,11 +168,13 @@ public class EditarExercicio extends NavigationActivity {
     }
 
     private void salvarEdicaoNoBanco() {
+        String novoNome = capitalizarCadaPalavra(editNomeExercicio.getText().toString().trim());
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            values.put(DataBaseHelper.COLUMN_EXERCICIO_NOME, capitalizarPrimeiraLetra(editNomeExercicio.getText().toString().trim()));
+            values.put(DataBaseHelper.COLUMN_EXERCICIO_NOME, novoNome);
             values.put(DataBaseHelper.COLUMN_SERIES, Integer.parseInt(editSeries.getText().toString()));
             values.put(DataBaseHelper.COLUMN_REPETICOES, Integer.parseInt(editRepeticoes.getText().toString()));
 
@@ -196,11 +198,23 @@ public class EditarExercicio extends NavigationActivity {
         }
     }
 
-    private String capitalizarPrimeiraLetra(String texto) {
+    private String capitalizarCadaPalavra(String texto) {
         if (texto == null || texto.isEmpty()) {
             return texto;
         }
-        return texto.substring(0, 1).toUpperCase() + texto.substring(1).toLowerCase();
+
+        StringBuilder resultado = new StringBuilder();
+        String[] palavras = texto.split("\\s+");
+
+        for (String palavra : palavras) {
+            if (!palavra.isEmpty()) {
+                if (resultado.length() > 0) resultado.append(" ");
+                resultado.append(palavra.substring(0, 1).toUpperCase())
+                        .append(palavra.substring(1).toLowerCase());
+            }
+        }
+
+        return resultado.toString();
     }
 
     @Override
