@@ -157,7 +157,7 @@ public class MeuTreino extends NavigationActivity {
         }
         new AlertDialog.Builder(this)
                 .setTitle("Confirmar Exclusão")
-                .setMessage("Tem certeza que deseja excluir todo o " + currentTreinoTipo + " e seus exercícios?")
+                .setMessage("Tem certeza que deseja excluir todo o Treino  " + currentTreinoTipo + " e seus exercícios?")
                 .setPositiveButton("Sim", (dialog, which) -> excluirTreinoCompleto())
                 .setNegativeButton("Não", null)
                 .show();
