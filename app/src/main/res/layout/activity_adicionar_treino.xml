@@ -49,7 +49,7 @@
     <EditText
         android:id="@+id/caixa_nome_treino"
         style="@style/Edit_Text"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edit_text"
         android:hint="@string/nome_do_treino"
         android:importantForAutofill="no"
@@ -61,8 +61,8 @@
     <TextView
         android:id="@+id/text_tipo_treino"
         style="@style/Edit_Text"
-        android:layout_marginTop="144dp"
         android:background="@drawable/edit_text"
+        android:layout_marginTop="144dp"
         android:importantForAutofill="no"
         android:text="@string/tipo_de_treino"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,6 +72,7 @@
 
     <EditText
         android:id="@+id/caixa_nome_exercicio"
+        android:layout_marginTop="20dp"
         style="@style/Edit_Text"
         android:background="@drawable/edit_text"
         android:hint="@string/nome_do_exercicio"
@@ -85,7 +86,7 @@
     <EditText
         android:id="@+id/caixa_num_serie"
         style="@style/Edit_Text"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_series"
         android:importantForAutofill="no"
@@ -97,7 +98,7 @@
     <EditText
         android:id="@+id/caixa_num_repeticoes"
         style="@style/Edit_Text"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edit_text"
         android:hint="@string/num_de_repeticoes"
         android:importantForAutofill="no"
@@ -112,7 +113,7 @@
         android:layout_width="322dp"
         android:layout_height="51dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="@color/orange_main"
         android:text="@string/bt_salvar"
         app:layout_constraintStart_toStartOf="parent"
