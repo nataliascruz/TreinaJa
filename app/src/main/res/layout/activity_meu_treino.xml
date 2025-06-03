@@ -24,7 +24,7 @@
         style="@style/Button_Estilo_2"
         android:layout_width="107dp"
         android:layout_height="53dp"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="100dp"
         android:background="@color/yellow_accents"
         android:text="@string/bt_treno_b"
@@ -37,11 +37,11 @@
         style="@style/Button_Estilo_2"
         android:layout_width="107dp"
         android:layout_height="53dp"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="145dp"
         android:layout_marginTop="100dp"
         android:background="@color/yellow_accents"
         android:text="@string/bt_treino_c"
-        app:layout_constraintStart_toEndOf="@id/treinoB"
+        app:layout_constraintStart_toEndOf="@id/treinoA"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -87,6 +87,7 @@
         android:layout_height="51dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="4dp"
+        android:background="#D9D9D9"
         android:text="@string/bt_concluir"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.377"
